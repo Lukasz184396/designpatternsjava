@@ -5,6 +5,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/*
+    MY SUMMARY - CONCLUSIONS
+
+    In the broken option class Research takes in constructor Relationships class
+    the rule is broken because high-level modules should not depend on low-level modules.
+    Both should depend on abstraction ( interface or abstract class).
+    Abstractions should not depend on details.
+    Details should depend on abstraction.
+
+    The solution use RelationshipsBrowser interface (abstractions)
+    which is passed as constructor param of Research class instead of Relationships class.
+    And Relationships implements RelationshipsBrowser so we can pass it in place of RelationshipsBrowser.
+
+    Now we can use classes which implements RelationshipsBrowser and pass ass constructor param of Research.
+
+*/
+
 public class DependencyInversionPrinciple {
     public static void main(String[] args) {
         Person parent = new Person("John");
