@@ -24,6 +24,12 @@ public class OpenClosePrinciple {
         System.out.println("Green products (new)");
         bf.filter(products,new ColorSpecification(Color.GREEN))
                 .forEach(p-> System.out.println(" - " + p.name + " is green" ));
+
+        //Test of new solution with couple filter conditions
+        System.out.println("Large green products");
+        bf.filter(products, new AndSpecification<>(
+                new ColorSpecification(Color.GREEN), new SizeSpecification(Size.LARGE)))
+                .forEach(p-> System.out.println(" - " + p.name + " is large and green" ));
     }
 }
 
@@ -112,5 +118,21 @@ class BetterFilter implements Filter<Product> {
     @Override
     public Stream<Product> filter(List<Product> items, Specification<Product> spec) {
         return items.stream().filter(p-> spec.isSatisfied(p));
+    }
+}
+
+// Added combination of multiple filter conditions
+class AndSpecification<T> implements Specification<T> {
+
+    private Specification<T> first, second;
+
+    public AndSpecification(Specification<T> first, Specification<T> second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    @Override
+    public boolean isSatisfied(T item) {
+        return first.isSatisfied(item) && second.isSatisfied(item);
     }
 }
