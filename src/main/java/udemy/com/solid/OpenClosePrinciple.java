@@ -4,7 +4,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+/*
+    MY SUMMARY - CONCLUSIONS
 
+    In the broken option to add new filter we need to MODIFY ProductFilter
+    we have to add new method so we broke rule CLOSE FOR MODIFICATION
+
+    The solution use Open for Extension so we add
+    interface Specification<T>
+    interface Filter<T>
+    class ColorSpecification implements Specification<Product>
+    class SizeSpecification implements Specification<Product>
+    class BetterFilter implements Filter<Product>
+
+    BetterFilter is more elastic because in filer method as the second parameter
+    is passed interface Specification instead of enum.
+    ColorSpecification and SizeSpecification implements Specification interface
+    se we can use it in place when Specification expected.
+
+    We can use new condition in BetterFilter by passing new class which implements Specification interface.
+*/
 public class OpenClosePrinciple {
     public static void main(String[] args) {
 
