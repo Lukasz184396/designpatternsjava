@@ -2,6 +2,8 @@ package udemy.com.solid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class DependencyInversionPrinciple {
     public static void main(String[] args) {
@@ -32,7 +34,7 @@ class Person {
     }
 }
 
-class Relationships {  //low-level - related to data storage, just allow manipulation of the list
+class Relationships implements RelationshipsBrowser{  //low-level - related to data storage, just allow manipulation of the list
 
     private List<Triplet<Person, Relationship, Person>> relations = new ArrayList<>();
 
@@ -44,18 +46,35 @@ class Relationships {  //low-level - related to data storage, just allow manipul
         relations.add(new Triplet<>(parent, Relationship.PARENT, child));
         relations.add(new Triplet<>(child, Relationship.CHILD, parent));
     }
+
+    @Override
+    public List<Person> findAllChildrenOf(String name) {
+        return relations.stream()
+                .filter( x -> Objects.equals(x.getFirst().name, name)
+                        && x.getSecond() == Relationship.PARENT)
+                .map(Triplet::getThird)
+                .collect(Collectors.toList());
+    }
 }
 
 class Research {    //high-level - does not care about data storage just care about actual research
 
     //constructor takes low level module as a dependency this broke DependencyInversionPrinciple
-    public Research(Relationships relationships) {
-        List<Triplet<Person, Relationship, Person>> relations = relationships.getRelations();
-        relations.stream()
-                .filter(p-> p.getFirst().name.equals("John") && p.getSecond() == Relationship.PARENT)
-                .forEach( ch -> System.out.println(
-                        "John has a child called " + ch.getThird().name
-                ));
+//    public Research(Relationships relationships) {
+//        List<Triplet<Person, Relationship, Person>> relations = relationships.getRelations();
+//        relations.stream()
+//                .filter(p-> p.getFirst().name.equals("John") && p.getSecond() == Relationship.PARENT)
+//                .forEach( ch -> System.out.println(
+//                        "John has a child called " + ch.getThird().name
+//                ));
+//    }
+
+    public Research( RelationshipsBrowser browser) {
+        List<Person> children = browser.findAllChildrenOf("John");
+        for(Person child : children) {
+            System.out.println("John has a child called " + child.name);
+        }
+
     }
 }
 
@@ -75,4 +94,9 @@ class Triplet<T, U, V> {
     public T getFirst() { return first; }
     public U getSecond() { return second; }
     public V getThird() { return third; }
+}
+
+//solution
+interface RelationshipsBrowser {
+    List<Person> findAllChildrenOf(String name);
 }
