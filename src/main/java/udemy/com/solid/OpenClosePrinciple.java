@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-//todo fix broken Open Close Principle
 
 public class OpenClosePrinciple {
     public static void main(String[] args) {
@@ -18,6 +17,12 @@ public class OpenClosePrinciple {
         ProductFilter pf = new ProductFilter();
         System.out.println("Green products (old)");
         pf.filterByColor(products, Color.GREEN)
+                .forEach(p-> System.out.println(" - " + p.name + " is green" ));
+
+        //Test of new solution
+        BetterFilter bf = new BetterFilter();
+        System.out.println("Green products (new)");
+        bf.filter(products,new ColorSpecification(Color.GREEN))
                 .forEach(p-> System.out.println(" - " + p.name + " is green" ));
     }
 }
@@ -55,10 +60,57 @@ class ProductFilter {
             final Size size) {
         return products.stream().filter(p->p.size == size);
     }
+
     public Stream<Product> filterBySizeAndColor(
             List<Product> products,
             final Size size,
             final Color color) {
         return products.stream().filter( p -> p.size ==size && p.color == color);
+    }
+
+}
+
+
+// solution
+interface Specification<T> {
+    boolean isSatisfied(T item);
+}
+
+interface Filter<T> {
+    Stream<T> filter (List<T> items, Specification<T> spec);
+}
+
+class ColorSpecification implements Specification<Product> {
+
+    private Color color;
+
+    public ColorSpecification(Color color) {
+        this.color = color;
+    }
+
+    @Override
+    public boolean isSatisfied(Product item) {
+        return item.color == color;
+    }
+}
+
+class SizeSpecification implements Specification<Product> {
+    private Size size;
+
+    public SizeSpecification(Size size) {
+        this.size = size;
+    }
+
+    @Override
+    public boolean isSatisfied(Product item) {
+        return item.size == size;
+    }
+}
+
+class BetterFilter implements Filter<Product> {
+
+    @Override
+    public Stream<Product> filter(List<Product> items, Specification<Product> spec) {
+        return items.stream().filter(p-> spec.isSatisfied(p));
     }
 }
